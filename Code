@@ -1,1 +1,22 @@
 
+import random
+
+data = []
+mean_array=[]
+for i in range(100):
+    data.append(random.randint(0,100))
+
+data.sort()
+counter=0
+interval = len(data)/4
+
+for i in range(4):
+    temp_sum = 0
+    for j in range(interval):
+        temp_sum += float(data[counter])
+        counter +=1
+    temp_aver = float(temp_sum/interval)
+    globals()['mean%s' % (i)] = temp_aver
+    mean_array.append(globals()['mean%s' % (i)])
+
+print mean_array
