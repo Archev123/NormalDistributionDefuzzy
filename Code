@@ -1,10 +1,17 @@
-
 import random
+
+file=open("dataoutput.txt","r+")
 
 data = []
 mean_array=[]
+Sax_data=[]
+Mean_array_finsih=[]
+
 for i in range(100):
     data.append(random.randint(0,100))
+
+for word in file.read().split():
+    Sax_data.append(int(word))
 
 data.sort()
 counter=0
@@ -19,4 +26,22 @@ for i in range(4):
     globals()['mean%s' % (i)] = temp_aver
     mean_array.append(globals()['mean%s' % (i)])
 
+print Sax_data
+
+for i in range(len(Sax_data)):
+    temp_data=Sax_data[i]
+    n = 0
+    TerVar1 = 1
+    temp_mean = 0
+    while TerVar1 != 0:
+        Temp_slice_data = int(temp_data%10)
+        temp_data = int (temp_data/10)
+        #print Temp_slice_data
+        TerVar1 = int(temp_data/10)
+        temp_mean += float(mean_array[Temp_slice_data-1])
+        n = n + 1
+    #print temp_mean
+    Mean_array_finsih.append(temp_mean/(n+1))
+
 print mean_array
+print Mean_array_finsih
