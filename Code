@@ -1,6 +1,6 @@
 Topic_number = 4
 Topic_word_number = 10
-alphabet_number=6
+alphabet_number = 5
 
 file=open("05-23_Step6_OriData.txt","r+")  #all the original data
 file4=open("05-23_Step4_topics.txt","r+") #LDA Topic Output
@@ -91,20 +91,23 @@ for i in range(len(Topic_DFMM)):
 KPI_sample = min(len(Mean_array_finsih),len(The_likely_Defuzzy))-1
 
 #----------------------KPI---------------------
-KPI_sum = 0
-MAE = 0
-MAPE = 0
-PMAD = 0
+KPI_sum = float(0)
+KPI_abs_sum = float(0)
+MAE = float(0)
+MAPE = float(0)
+PMAD = float(0)
 
 for i in range(KPI_sample):
-    KPI_sum += abs(Mean_array_finsih[i] - The_likely_Defuzzy[i])
-    PMAD += (abs(Mean_array_finsih[i] - The_likely_Defuzzy[i]) / abs(Mean_array_finsih[i]))
+    KPI_sum += (abs(Mean_array_finsih[i] - The_likely_Defuzzy[i]))
+    KPI_abs_sum +=  abs(Mean_array_finsih[i])
+
+PMAD = KPI_sum / KPI_abs_sum
 MAPE = PMAD / KPI_sample
 MAE = KPI_sum / KPI_sample
 
-print PMAD
-print MAPE
 print MAE
+print MAPE
+print PMAD
 
 file.close()
 file2.close()
