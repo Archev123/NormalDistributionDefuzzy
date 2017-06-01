@@ -1,31 +1,38 @@
-import random
+Topic_number = 4
+Topic_word_number = 10
+alphabet_number=6
 
-file=open("dataoutput.txt","r+")
-file2=open("Pre_topic_output.txt","r+")
+file=open("05-23_Step6_OriData.txt","r+")  #all the original data
+file4=open("05-23_Step4_topics.txt","r+") #LDA Topic Output
+file3=open("05-23_Step6_DFMM.txt","r+") #Topic prediction data
+file2=open("Test_Sax_Data.txt","r+") #test SAX_data  ex:3214,2214
 
-Topic_data=[]
+Topic_DFMM=[]
 data = []
+Ori_data=[]
 mean_array=[]
 Sax_data=[]
 Mean_array_finsih=[]
 The_likely_Defuzzy=[]
 SD = 0 #Standard Deviation
+Topic_Mean = [[]for i in range(Topic_number)]
 
-for i in range(100):
-    data.append(random.randint(0,100))
+for i in file.read().split():
+    data.append(float(i))
+    Ori_data.append(float(i))
 
-for word in file.read().split():
+for word in file2.read().split():
     Sax_data.append(int(word))
 
-for Topic in file2.read().split():
-    Topic_data.append(round(float(Topic)))
+for Topic in file3.read().split():
+    Topic_DFMM.append(round(float(Topic)))
 
 
 data.sort()
 counter=0
-interval = len(data)/4
+interval = len(data)/alphabet_number
 
-for i in range(4):
+for i in range(alphabet_number):
     temp_sum = 0
     for j in range(interval):
         temp_sum += float(data[counter])
@@ -34,28 +41,72 @@ for i in range(4):
     globals()['mean%s' % (i)] = temp_aver
     mean_array.append(globals()['mean%s' % (i)])
 
+
 for i in range(len(Sax_data)):
-    temp_data=Sax_data[i]
+    temp_data = Sax_data[i]
     n = 0
     TerVar1 = 1
     temp_mean = 0
     while TerVar1 != 0:
-        Temp_slice_data = int(temp_data%10)
+        Temp_slice_data = int(temp_data % 10)
         temp_mean += float(mean_array[Temp_slice_data - 1])
         temp_data = int (temp_data/10)
         TerVar1 = temp_data
         n = n + 1
-    #print temp_mean
     Mean_array_finsih.append(temp_mean/(n))
 
-print mean_array
-print Mean_array_finsih
+desicion_var = 0
+Topic_counter = 0
+for word in file4.read().split():
+    temp_mean = 0
+    temp_pab = 0
+    temp_topic = Topic_counter % Topic_number
+    if (desicion_var % 2) == 0:
+        temp_data = float(word)
+        r1 = temp_data
+        temp_sum = 0
+        while r1 !=0:
+            Temp_slice_data = int(temp_data % 10)
+            temp_sum += float(mean_array[Temp_slice_data - 1])
+            temp_data = int(temp_data / 10)
+            r1 = temp_data
+    if (desicion_var % 2) == 1:
+        temp_pab = float(word)
+        desicion_var = 0
+        Topic_counter += 1
+        temp_mean = temp_sum * temp_pab
+        Topic_Mean[temp_topic].append(temp_mean)
+    desicion_var += 1
 
-for i in range(len(Topic_data)):
-    temp_int = int(Topic_data[i])
+
+#for i in range((Topic_counter-1)/8):
+
+
+for i in range(len(Topic_DFMM)):
+    temp_int = int(Topic_DFMM[i])
     The_likely_Defuzzy.append(mean_array[temp_int-1])
 
-print The_likely_Defuzzy
+#print mean_array
 
-for i in range(len(The_likely_Defuzzy)):
-    temp_output=
+KPI_sample = min(len(Mean_array_finsih),len(The_likely_Defuzzy))-1
+
+#----------------------KPI---------------------
+KPI_sum = 0
+MAE = 0
+MAPE = 0
+PMAD = 0
+
+for i in range(KPI_sample):
+    KPI_sum += abs(Mean_array_finsih[i] - The_likely_Defuzzy[i])
+    PMAD += (abs(Mean_array_finsih[i] - The_likely_Defuzzy[i]) / abs(Mean_array_finsih[i]))
+MAPE = PMAD / KPI_sample
+MAE = KPI_sum / KPI_sample
+
+print PMAD
+print MAPE
+print MAE
+
+file.close()
+file2.close()
+file3.close()
+file4.close()
